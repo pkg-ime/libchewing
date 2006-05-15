@@ -1,0 +1,11 @@
+libchewing for Debian
+
+Known Problem
+-----------------------
+User's phrase database file may be corrupted when scim does not exit 
+gracefully, for example, during an X11 server crash or power outage.
+
+You have to remove phrase database file ($HOME/.chewing/uhash.dat for
+libchewing >= 0.3.0 or $HOME/.chewing/hash.dat for older versions)
+
+Note: you will lose all your personal and favorite phrases this way!

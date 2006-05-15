@@ -1,0 +1,51 @@
+Source: libchewing
+Priority: optional
+Maintainer: Kanru Chen <koster@debian.org.tw>
+Build-Depends: debhelper (>= 5.0.0), gcc (>= 3:3.3),libtool (>= 1.5.6)
+Standards-Version: 3.7.2.0
+
+Package: libchewing3-dev
+Conflicts: libchewing-dev, libchewing1-dev, libchewing2-dev
+Section: libdevel
+Architecture: any
+Depends: libchewing3 (= ${Source-Version})
+Description: intelligent phonetic input method library (developer version)
+ libchewing is an intelligent phonetic input method library for Chinese.
+ .
+ It provides the core algorithm and logic so that they can be shared among
+ the various input methods like JMCCE, xcin-chewing, scim-chewing, 
+ iiimf-chewing, screen-chewing, ime-chewing, etc.
+ .
+ The Chewing input method is a smart bopomofo fonetics input method that
+ is useful for inputing Mandarin Chinese based language.
+
+Package: libchewing3
+Provides: libchewing
+Section: libs
+Architecture: any
+Depends: libchewing3-data (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: intelligent phonetic input method library
+ libchewing is an intelligent phonetic input method library for Chinese.
+ .
+ It provides the core algorithm and logic so that they can be shared among
+ the various input methods like JMCCE, xcin-chewing, scim-chewing, 
+ iiimf-chewing, screen-chewing, ime-chewing, etc.
+ .
+ The Chewing input method is a smart bopomofo fonetics input method that
+ is useful for inputing Mandarin Chinese based language.
+
+Package: libchewing3-data
+Provides: libchewing-data
+Conflicts: libchewing-data (<= 0.2.7)
+Section: misc
+Architecture: any
+Depends: ${misc:Depends}
+Description:intelligent phonetic input method library - data files
+ libchewing is an intelligent phonetic input method library for Chinese.
+ .
+ It provides the core algorithm and logic so that they can be shared among
+ the various input methods like JMCCE, xcin-chewing, scim-chewing, 
+ iiimf-chewing, screen-chewing, ime-chewing, etc.
+ .
+ The Chewing input method is a smart bopomofo fonetics input method that
+ is useful for inputing Mandarin Chinese based language.
