@@ -8,12 +8,22 @@
  * of this file.
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "chewing.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_NCURSESW_NCURSES_H
 #include <ncursesw/ncurses.h>
+#elif defined( HAVE_NCURSES_NCURSES_H )
+#include <ncurses/ncurses.h>
+#else
+#error "There is no curses package found."
+#endif
 #include <locale.h>
 
 /* Avoid incorrect KEY_ENTER definition */
@@ -183,7 +193,7 @@ void show_choose_buffer( int x, int y, ChewingContext *ctx )
 	
 	chewing_cand_Enumerate( ctx );
 	while ( chewing_cand_hasNext( ctx ) ) {
-		if ( i == chewing_cand_ChoicePerPage( ctx ) )
+		if ( i > chewing_cand_ChoicePerPage( ctx ) )
 			break;
 		sprintf( str, "%d.", i );
 		if ( hasColor )
@@ -295,7 +305,7 @@ int main( int argc, char *argv[] )
 	chewing_set_KBType( ctx, chewing_KBStr2Num( "KB_DEFAULT" ) );
 
 	/* Fill configuration values */
-	config.selectAreaLen = 20;
+	config.candPerPage = 9;
 	config.maxChiSymbolLen = 16;
 	config.bAddPhraseForward = 1;
 

@@ -134,7 +134,7 @@ int main( int argc, char *argv[] )
 	chewing_set_KBType( ctx, chewing_KBStr2Num( "KB_DEFAULT" ) );
 
 	/* Fill the configuration values */
-	config.selectAreaLen = 20;
+	config.candPerPage = 20;
 	config.maxChiSymbolLen = 16;
 
 	for ( i = 0; i < 10; i++ )
@@ -148,8 +148,14 @@ int main( int argc, char *argv[] )
 			case KEY_LEFT:
 				chewing_handle_Left( ctx );
 				break;
+			case KEY_SLEFT:
+				chewing_handle_ShiftLeft( ctx );
+				break;
 			case KEY_RIGHT:
 				chewing_handle_Right( ctx );
+				break;
+			case KEY_SRIGHT:
+				chewing_handle_ShiftRight( ctx );
 				break;
 			case KEY_UP:
 				chewing_handle_Up( ctx );

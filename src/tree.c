@@ -95,7 +95,7 @@ static void TerminateTree()
 		free( tree );
 }
 #endif
-		
+
 void ReadTree( const char *prefix )
 {
 	int i;
@@ -292,7 +292,7 @@ int TreeFindPhrase( int begin, int end, const uint16 *phoneSeq )
 			if ( child < 0 || child * sizeof(TreeType) > tree_size )
 				return -1;
 #endif
-	
+
 			if ( tree[ child ].phone_id == phoneSeq[ i ] )
 				break;
 		}
@@ -395,7 +395,7 @@ static void FindInterval(
 			 * but when the phrase is the same, the user phrase overrides 
 			 * static dict
 			 */
-			if ( puserphrase != NULL && pdictphrase == NULL ) { 
+			if ( puserphrase != NULL && pdictphrase == NULL ) {
 				AddInterval( 
 					ptd, 
 					begin, 
@@ -907,11 +907,32 @@ static void ShowList( TreeDataType *ptd )
 
 static RecordNode* NextCut( TreeDataType *tdt, PhrasingOutput *ppo )
 {
+	/* pop nNumCut-th candidate to first */
 	int i;
+	RecordNode *former;
+	RecordNode *want;
+
 	if ( ppo->nNumCut >= tdt->nPhListLen )
 		ppo->nNumCut = 0;
-	for ( i = 0; i < ppo->nNumCut; i++ )
-		tdt->phList = tdt->phList->next;
+	if (ppo->nNumCut == 0)
+		return tdt->phList;
+
+	/* find the former of our candidate */
+	former = tdt->phList;
+	for ( i = 0; i < ppo->nNumCut - 1; i++ ) {
+		former = former->next;
+		assert( former );
+	}
+
+	/* take the candidate out of the listed list */
+	want = former->next;
+	assert( want );
+	former->next = former->next->next;
+
+	/* prepend to front of list */
+	want->next = tdt->phList;
+	tdt->phList = want;
+
 	return tdt->phList;
 }
 
