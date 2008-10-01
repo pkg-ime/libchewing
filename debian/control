@@ -2,10 +2,10 @@ Source: libchewing
 Section: libs
 Priority: optional
 Maintainer: Kanru Chen <koster@debian.org.tw>
+Uploaders: Andrew Lee <andrew@linux.org.tw>
 Build-Depends: debhelper (>= 7), gcc (>= 3:3.3),libtool (>= 1.5.6)
 Standards-Version: 3.8.0
 Homepage: http://chewing.csie.net
-Uploaders: andrew@linux.org.tw
 DM-Upload-Allowed: yes
 
 Package: libchewing3-dev
