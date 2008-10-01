@@ -5,7 +5,7 @@
  *	Lu-chuan Kung and Kang-pen Chen.
  *	All rights reserved.
  *
- * Copyright (c) 2004, 2005, 2006
+ * Copyright (c) 2004, 2005, 2006, 2007
  *	libchewing Core Team. See ChangeLog for details.
  *
  * See the file "COPYING" for information on usage and redistribution
@@ -107,6 +107,7 @@ static void SetAvailInfo(
 				/* save it! */
 				pai->avail[ pai->nAvail ].len = diff + 1;
 				pai->avail[ pai->nAvail ].id = -1;
+				pai->nAvail++;
 			} else {
 				pai->avail[ pai->nAvail ].len = 0;
 				pai->avail[ pai->nAvail ].id = -1;
@@ -133,13 +134,16 @@ static int ChoiceTheSame( ChoiceInfo *pci, char *str, int len )
  */
 static void SetChoiceInfo(
 		ChoiceInfo *pci,AvailInfo *pai, uint16 *phoneSeq, int cursor,
-		int selectAreaLen )
+		int candPerPage )
 {
 	Word tempWord;
 	Phrase tempPhrase;
 	int len;
 	UserPhraseData *pUserPhraseData;
 	uint16 userPhoneSeq[ MAX_PHONE_SEQ_LEN ];
+	
+	// Clears previous candidates.
+	memset( pci->totalChoiceStr, '\0', sizeof(char) * MAX_CHOICE * MAX_PHRASE_LEN * MAX_UTF8_SIZE + 1);
 
 	pci->nTotalChoice = 0;
 	len = pai->avail[ pai->currentAvail ].len;
@@ -199,8 +203,7 @@ static void SetChoiceInfo(
 	}
 
 	/* magic number */
-	//pci->nChoicePerPage = ( selectAreaLen - 5 ) / ( len * 2 + 3 );
-	pci->nChoicePerPage = selectAreaLen / (len + 1);
+	pci->nChoicePerPage = candPerPage;
 	if ( pci->nChoicePerPage > MAX_SELKEY )
 		pci->nChoicePerPage = MAX_SELKEY;
 	pci->nPage = CEIL_DIV( pci->nTotalChoice, pci->nChoicePerPage );
@@ -216,9 +219,9 @@ int ChoiceFirstAvail( ChewingData *pgdata )
 
 	/* see if there is some word in the cursor position */
 	if ( pgdata->nPhoneSeq == pgdata->cursor )
-		pgdata->cursor--;
+		pgdata->cursor = pgdata->phrOut.dispInterval[ pgdata->phrOut.nDispInterval - 1 ].from;
 	if ( pgdata->chiSymbolBufLen == pgdata->chiSymbolCursor )
-		pgdata->chiSymbolCursor--;
+		pgdata->chiSymbolCursor = pgdata->phrOut.dispInterval[ pgdata->phrOut.nDispInterval - 1 ].from;
 
 	pgdata->bSelect = 1;
 
@@ -234,7 +237,7 @@ int ChoiceFirstAvail( ChewingData *pgdata )
 		&( pgdata->availInfo ), 
 		pgdata->phoneSeq, 
 		pgdata->cursor, 
-		pgdata->config.selectAreaLen );
+		pgdata->config.candPerPage );
 	return 0;
 }
 
@@ -248,7 +251,7 @@ int ChoicePrevAvail( ChewingData *pgdata )
 		&( pgdata->availInfo ), 
 		pgdata->phoneSeq, 
 		pgdata->cursor,
-		pgdata->config.selectAreaLen );
+		pgdata->config.candPerPage );
 	return 0;
 }
 
@@ -262,7 +265,7 @@ int ChoiceNextAvail( ChewingData *pgdata )
 		&( pgdata->choiceInfo ), 
 		&( pgdata->availInfo ), 
 		pgdata->phoneSeq,pgdata->cursor,
-		pgdata->config.selectAreaLen );
+		pgdata->config.candPerPage );
 	return 0;
 }
 
@@ -272,7 +275,7 @@ int ChoiceEndChoice( ChewingData *pgdata )
 	pgdata->choiceInfo.nTotalChoice = 0;
 	pgdata->choiceInfo.nPage = 0;
 
-	if ( pgdata->choiceInfo.isSymbol != 1 ) {
+	if ( pgdata->choiceInfo.isSymbol != 1 || pgdata->choiceInfo.isSymbol != 2 ) {
 		/* return to the old cursor & chiSymbolCursor position */
 		pgdata->cursor = pgdata->choiceInfo.oldCursor;
 		pgdata->chiSymbolCursor = pgdata->choiceInfo.oldChiSymbolCursor;

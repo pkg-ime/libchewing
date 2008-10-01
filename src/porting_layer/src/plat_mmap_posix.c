@@ -1,3 +1,13 @@
+/**
+ * plat_mmap_posix.c
+ *
+ * Copyright (c) 2005, 2006, 2008                                       
+ *      libchewing Core Team. See ChangeLog for details.
+ *
+ * See the file "COPYING" for information on usage and redistribution
+ * of this file.
+ */
+
 #ifdef HAVE_CONFIG_H
   #include <config.h>
 #endif
@@ -48,7 +58,7 @@ size_t plat_mmap_create( plat_mmap *handle, char *file, int fileAccessAttr )
 	if ( FLAG_ATTRIBUTE_READ & fileAccessAttr )
 		handle->fd = open( file, O_RDONLY );
 	else
-		handle->fd = open( file, O_RDWR | O_CREAT );
+		handle->fd = open( file, O_RDWR );
 
 	if ( handle->fd == -1 )
 		return 0;

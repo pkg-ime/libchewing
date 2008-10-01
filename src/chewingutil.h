@@ -25,13 +25,12 @@ void SetUpdatePhraseMsg( ChewingData *pgdata, char *addWordSeq, int len, int sta
 int NoSymbolBetween( ChewingData *pgdata, int begin, int end );
 int ChewingIsEntering( ChewingData *pgdata );
 void CleanAllBuf( ChewingData * );
-int SemiSymbolInput(int key, ChewingData *pgdata);
-int SpecialEtenSymbolInput( int key, ChewingData *pgdata );
 int SpecialSymbolInput( int key, ChewingData *pgdata );
 int FullShapeSymbolInput( int key, ChewingData *pgdata );
+int EasySymbolInput( int key, ChewingData *pgdata, ChewingOutput *pgo );
 int SymbolInput( int key, ChewingData *pgdata );
 int SymbolChoice( ChewingData *pgdata, int sel_i );
-int HaninSymbolInput(ChoiceInfo *pci, AvailInfo *pai, const uint16 phoneSeq[],  int selectAreaLen);
+int HaninSymbolInput( ChoiceInfo *pci, AvailInfo *pai, const uint16 phoneSeq[],  int candPerPage );
 int WriteChiSymbolToBuf( wch_t csBuf[], int csBufLen, ChewingData *pgdata );
 int ReleaseChiSymbolBuf( ChewingData *pgdata, ChewingOutput *);
 int AddChi( uint16 phone, ChewingData *pgdata );
@@ -50,6 +49,10 @@ int ChewingKillChar(
 void RemoveSelectElement( int i, ChewingData *pgdata );
 int IsPreferIntervalConnted( int cursor, ChewingData *pgdata );
 int OpenSymbolChoice( ChewingData *pgdata );
+
+int InitSymbolTable( const char *prefix );
+int InitEasySymbolInput(const char *prefix);
+static int FindSymbolKey( const char* symbol );
 
 #endif
 

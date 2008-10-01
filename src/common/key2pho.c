@@ -1,6 +1,10 @@
 /**
  * key2pho.c
  *
+ * Copyright (c) 1999, 2000, 2001
+ *	Lu-chuan Kung and Kang-pen Chen.
+ *	All rights reserved.
+ *
  * Copyright (c) 2004, 2005, 2006
  *	libchewing Core Team. See ChangeLog for details.
  *
@@ -12,6 +16,8 @@
  * @file key2pho.c
  * @brief map zuins to uint16 type according to different kb_type
  */
+
+/* This file is encoded in UTF-8 */
 
 #include <stdio.h>
 #include <string.h>
@@ -50,6 +56,7 @@ static char *key_str[ MAX_KBTYPE ] = {
 	 "bpmfdtnlvkhgvcgycjqwsexuaorwiqzpmntlhdfjk",		/* ET26 */
 	 "1'a;2,oq.ejpuk5yixfdbghm8ctw9rnv0lsz[7634",		/* Dvorak */
 	 "bpmfdtnlgkhjvcjvcrzasexuyhgeiawomnklldhtn",		/* Dvorak Hsu */
+	 "qqazwwsxedcrfvttgbyhnujmuikbiolmoplnpyerd",		/* DACHEN-CP26 */
 	 "1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-7634",		/* pinyin */
 } ;
 

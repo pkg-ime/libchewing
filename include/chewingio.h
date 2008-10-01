@@ -5,7 +5,7 @@
  *	Lu-chuan Kung and Kang-pen Chen.
  *	All rights reserved.
  *
- * Copyright (c) 2004, 2005
+ * Copyright (c) 2004, 2005, 2008
  *	libchewing Core Team. See ChangeLog for details.
  *
  * See the file "COPYING" for information on usage and redistribution
@@ -37,11 +37,12 @@ CHEWING_API int chewing_handle_Right( ChewingContext * );
 CHEWING_API int chewing_handle_Up( ChewingContext * );
 CHEWING_API int chewing_handle_Home( ChewingContext * );
 CHEWING_API int chewing_handle_End( ChewingContext * );
+CHEWING_API int chewing_handle_PageUp( ChewingContext * );
+CHEWING_API int chewing_handle_PageDown( ChewingContext * );
 CHEWING_API int chewing_handle_Down( ChewingContext * );
 CHEWING_API int chewing_handle_Capslock( ChewingContext * );
 CHEWING_API int chewing_handle_Default( ChewingContext *, int key );
 CHEWING_API int chewing_handle_CtrlNum( ChewingContext *, int key );
-CHEWING_API int chewing_handle_CtrlOption( ChewingContext *, int key );
 CHEWING_API int chewing_handle_ShiftSpace( ChewingContext * );
 CHEWING_API int chewing_handle_DblTab( ChewingContext * );
 CHEWING_API int chewing_handle_Numlock( ChewingContext *, int key);
@@ -97,6 +98,14 @@ CHEWING_API int chewing_Reset( ChewingContext *ctx );
 CHEWING_API int chewing_set_KBType( ChewingContext *ctx, int kbtype );
 
 /**
+ * @breif Get keyboard type
+ *
+ * @param ctx
+ * @return If successed then return kbtype from KBStr2Num
+ */
+CHEWING_API int chewing_get_KBType( ChewingContext *ctx );
+
+/**
  * @brief Terminate chewing
  *
  * Terminate the I/O routines for chewing.
@@ -112,7 +121,7 @@ CHEWING_API void chewing_Terminate();
 CHEWING_API void chewing_set_ChiEngMode( ChewingContext *ctx, int mode );
 
 /**
- * @brief Get chewing's current mode
+ * @brief Get chewing's current english, chinese mode
  *
  * @param ctx
  * 

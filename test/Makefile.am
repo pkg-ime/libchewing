@@ -1,14 +1,19 @@
 testdir = $(top_builddir)/test
 TESTDATA = $(testdir)/test.txt
 DEFAULT_TESTDATA = $(testdir)/default-test.txt
-LIBCHEWING = $(top_builddir)/src/libchewing.la
+LIBCHEWING = \
+	$(top_builddir)/src/libchewing.la \
+	$(top_builddir)/src/common/libcommon.la \
+	$(top_builddir)/src/porting_layer/src/libporting_layer.la
 DATADIR = $(top_builddir)/data
 CHEWINGDATA = \
 	$(DATADIR)/us_freq.dat \
 	$(DATADIR)/ch_index.dat \
 	$(DATADIR)/dict.dat \
 	$(DATADIR)/ph_index.dat \
-	$(DATADIR)/fonetree.dat
+	$(DATADIR)/fonetree.dat \
+	$(DATADIR)/swkb.dat \
+	$(DATADIR)/symbols.dat
 
 $(TESTDATA): $(DEFAULT_TESTDATA)
 	if [ ! -f $(TESTDATA) ]; then \
@@ -42,7 +47,7 @@ INCLUDES = \
 	-I$(top_srcdir)/src/porting_layer/include
 
 testchewing_SOURCES = testchewing.c
-testchewing_LDADD = $(LIBCHEWING) -lncursesw
+testchewing_LDADD = $(LIBCHEWING)
 testchewing_DEPENDENCIES = $(LIBCHEWING)
 
 if ENABLE_TEXT_UI
@@ -70,3 +75,5 @@ do_test_DEPENDENCIES = $(LIBCHEWING)
 else
 UNIT_TEST_BIN=
 endif
+
+CLEANFILES = uhash.dat

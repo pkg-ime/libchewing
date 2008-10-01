@@ -2,7 +2,8 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT(libchewing, 0.3.0, chewing-devel@googlegroups.com)
+AC_INIT(libchewing, 0.3.1, chewing-devel@googlegroups.com)
+AC_CONFIG_AUX_DIR([autotools])
 AC_CONFIG_SRCDIR([src/chewingio.c])
 
 AC_SUBST(PACKAGE_VERSION)
@@ -13,7 +14,7 @@ AC_SUBST(PACKAGE_VERSION)
 LIBCHEWING_CURRENT=3
 
 # increment any time the source changes; set to 0 if you increment CURRENT
-LIBCHEWING_REVISION=0
+LIBCHEWING_REVISION=1
 
 # increment if any interfaces have been added; set to 0
 # if any interfaces have been removed. removal has 
@@ -79,33 +80,48 @@ AC_FUNC_MEMCMP
 AC_CHECK_FUNCS([memchr memmove memset mkdir strchr strstr])
 
 # Checks for check unit test framework
-AM_PATH_CHECK([0.8.2], [ enable_check=yes ], [ enable_check=no ])
+PKG_CHECK_MODULES(CHECK, check >= 0.9.4, enable_check=yes, enble_check=no)
 AM_CONDITIONAL(ENABLE_UNIT_TEST, test $enable_check = "yes")
 
 # Checks for ncursesw
+OLDCFLAGS=$CFLAGS
 LIB_NAME=ncursesw
 NCURSESW_CFLAGS=
 NCURSESW_LIBS=
-for p in $HOME /usr/local /usr
+for p in "$HOME/include" "$prefix/include" /usr/local/include /usr/include
 do
-	if test -f $p/include/ncursesw/curses.h
+	if test -f "$p/ncursesw/ncurses.h"
 	then
-		NCURSESW_CFLAGS="-I$p/include/ncursesw"
-		test $p != /usr && NCURSESW_CFLAGS="-I$p/include"
+		NCURSESW_CFLAGS="-I$p"
+		AC_DEFINE(HAVE_NCURSESW_NCURSES_H, 1, [ Define to 1 if you have the <ncursesw/ncurses.h> header file. ])
 		break
-	elif test $p != /usr
+	elif test -f "$p/ncurses/ncurses.h"
 	then
-		if test -f $p/include/curses.h
+		NCURSESW_CFLAGS="-I$p"
+		AC_DEFINE(HAVE_NCURSES_NCURSES_H, 1, [ Define to 1 if you have the <ncurses/ncurses.h> header file. ])
+		break
+	fi
+done
+
+for p in "$HOME/lib" "$prefix/lib" /usr/local/lib /usr/lib
+do
+	if test -f "$p/libncursesw.so"
+	then
+		if test "$p" != x/usr/lib
 		then
-			NCURSESW_CFLAGS="-I$p/include"
-			break
+			NCURSESW_LIBS="-L$p -lncursesw"
+		else
+			NCURSESW_LIBS="-lncursesw"
 		fi
+		break
 	fi
 done
 
 enable_ncursesw=yes
-NCURSESW_LIBS="-lncursesw"
-if test -z $NCURSESW_CFLAGS; then
+if test -z "$NCURSESW_CFLAGS"; then
+	enable_ncursesw=no
+fi
+if test -z "$NCURSESW_LIBS"; then
 	enable_ncursesw=no
 fi
 AC_SUBST(NCURSESW_CFLAGS)
