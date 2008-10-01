@@ -4,6 +4,7 @@ libchewing (0.3.1-1) unstable; urgency=low
   * Update standards-version to 3.8.0
   * Add Homepage header
   * Add Priority to all binary package field
+  * Add Andrew Lee <andrew@linux.org.tw> to Uploaders
   * Change debhelper compatibility to 7
   * Simplify debian/rules
   * Now build libchewing3-data in binary-indep (Closes: #303000)

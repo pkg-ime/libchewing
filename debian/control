@@ -5,6 +5,8 @@ Maintainer: Kanru Chen <koster@debian.org.tw>
 Build-Depends: debhelper (>= 7), gcc (>= 3:3.3),libtool (>= 1.5.6)
 Standards-Version: 3.8.0
 Homepage: http://chewing.csie.net
+Uploaders: andrew@linux.org.tw
+DM-Upload-Allowed: yes
 
 Package: libchewing3-dev
 Conflicts: libchewing-dev, libchewing1-dev, libchewing2-dev
