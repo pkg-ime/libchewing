@@ -81,24 +81,11 @@ install: build
 
 # Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
+	dh binary-indep --sourcedir=debian/tmp
 
 # Build architecture-dependent files here.
 binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs 
-	dh_installdocs
-	dh_install --sourcedir=debian/tmp
-	dh_link
-	dh_strip
-	dh_compress
-	dh_makeshlibs
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+	dh binary-arch --sourcedir=debian/tmp
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install 

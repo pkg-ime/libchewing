@@ -2,7 +2,7 @@ Source: libchewing
 Section: libs
 Priority: optional
 Maintainer: Kanru Chen <koster@debian.org.tw>
-Build-Depends: debhelper (>= 5.0.0), gcc (>= 3:3.3),libtool (>= 1.5.6)
+Build-Depends: debhelper (>= 7), gcc (>= 3:3.3),libtool (>= 1.5.6)
 Standards-Version: 3.8.0
 Homepage: http://chewing.csie.net
 
@@ -27,7 +27,7 @@ Provides: libchewing
 Section: libs
 Priority: optional
 Architecture: any
-Depends: libchewing3-data (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libchewing3-data (= ${source:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: intelligent phonetic input method library
  libchewing is an intelligent phonetic input method library for Chinese.
  .
@@ -43,7 +43,7 @@ Provides: libchewing-data
 Conflicts: libchewing-data (<= 0.2.7)
 Section: misc
 Priority: optional
-Architecture: any
+Architecture: all
 Depends: ${misc:Depends}
 Description:intelligent phonetic input method library - data files
  libchewing is an intelligent phonetic input method library for Chinese.
