@@ -58,7 +58,7 @@ clean:
 	rm -f build-stamp 
 
 	# Add here commands to clean up after the build process.
-	-$(MAKE) distclean
+	[ ! -f Makefile ] || $(MAKE) distclean
 
 #	scripts/remove-autotool.sh
 	-rm -f test/Makefile
