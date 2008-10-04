@@ -8,7 +8,7 @@ build-stamp:
 	touch build-stamp
 
 clean:
-	-rm -f test/Makefile
+	[ ! -f test/Makefile ] || (cd test; $(MAKE) distclean)
 	dh clean
 
 install: build install-stamp
