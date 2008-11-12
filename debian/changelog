@@ -7,7 +7,7 @@ libchewing (0.3.1-1) unstable; urgency=low
   * Add Andrew Lee <andrew@linux.org.tw> to Uploaders
   * Change debhelper compatibility to 7
   * Simplify debian/rules
-  * Conflict with scim-chewing (< 0.3.2)
+  * Conflict with scim-chewing (<< 0.3.2)
   * Now build libchewing3-data in binary-indep (Closes: #303000)
   * Closes: #427974: cannot type any zuo words. Fixed upstream.
 
