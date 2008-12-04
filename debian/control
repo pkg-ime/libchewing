@@ -48,7 +48,7 @@ Provides: libchewing-data
 Conflicts: libchewing-data (<= 0.2.7)
 Section: misc
 Priority: optional
-Architecture: all
+Architecture: any
 Depends: ${misc:Depends}
 Description:intelligent phonetic input method library - data files
  libchewing is an intelligent phonetic input method library for Chinese.
