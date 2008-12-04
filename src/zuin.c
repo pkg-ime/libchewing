@@ -25,9 +25,10 @@
 #include <string.h>
 
 #include "global.h"
-#include "zuin.h"
-#include "char.h"
-#include "hanyupinyin.h"
+#include "zuin-private.h"
+#include "char-private.h"
+#include "key2pho-private.h"
+#include "hanyupinyin-private.h"
 #include "private.h"
 
 static int IsDvorakHsuPhoEndKey( int pho_inx[], int key )
@@ -574,7 +575,8 @@ static int IsSymbolKey(int key)
 
 static int PinYinInput( ZuinData *pZuin, int key )
 {
-	int err = 0, status, i;
+	int err = 0, status;
+	unsigned int i;
 	char zuinKeySeq[ 5 ], buf[ 2 ];
 
 	DEBUG_CHECKPOINT();

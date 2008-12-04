@@ -5,7 +5,7 @@
  *	Lu-chuan Kung and Kang-pen Chen.
  *	All rights reserved.
  *
- * Copyright (c) 2004, 2005, 2006
+ * Copyright (c) 2004, 2005, 2006, 2008
  *	libchewing Core Team. See ChangeLog for details.
  *
  * See the file "COPYING" for information on usage and redistribution
@@ -23,18 +23,25 @@
 
 #include "chewing-utf8-util.h"
 #include "chewing-definition.h"
-#include "userphrase.h"
+#include "userphrase-private.h"
 #include "global.h"
-#include "dict.h"
-#include "char.h"
+#include "global-private.h"
+#include "dict-private.h"
+#include "char-private.h"
+#include "tree-private.h"
 #include "private.h"
 #include "plat_mmap.h"
 
 #define INTERVAL_SIZE ( ( MAX_PHONE_SEQ_LEN + 1 ) * MAX_PHONE_SEQ_LEN / 2 )
 
+typedef struct {
+	int from, to, pho_id, source;
+	Phrase *p_phr;
+} PhraseIntervalType;
+
 typedef struct tagRecordNode {
 	int *arrIndex;		/* the index array of the things in "interval" */
-	int nInter, freq;
+	int nInter, score;
 	struct tagRecordNode *next;
 	int nMatchCnnct;	/* match how many Cnnct. */
 } RecordNode;
@@ -49,11 +56,11 @@ typedef struct {
 } TreeDataType;
 
 #ifdef USE_BINARY_DATA
-extern TreeType *tree;
+TreeType *tree;
 static unsigned int tree_size = 0;
-static plat_mmap m_mmap;
+static plat_mmap tree_mmap;
 #else
-extern TreeType tree[ TREE_SIZE ];
+TreeType tree[ TREE_SIZE ];
 #endif
 
 static int IsContain( IntervalType in1, IntervalType in2 )
@@ -88,39 +95,36 @@ static int GetIntersection( IntervalType in1, IntervalType in2, IntervalType *in
 }
 #endif
 
-#ifdef USE_BINARY_DATA
 static void TerminateTree()
 {
-	if ( tree )
-		free( tree );
-}
+#ifdef USE_BINARY_DATA
+	plat_mmap_close( &tree_mmap );
 #endif
+}
 
-void ReadTree( const char *prefix )
+void InitTree( const char *prefix )
 {
-	int i;
-	FILE *infile;
-	char filename[ 100 ];
+	char filename[ PATH_MAX ];
 
 #ifdef USE_BINARY_DATA
 	size_t offset = 0;
-	size_t csize = 0;
+	size_t csize;
+#else
+	FILE *infile;
+	int i;
 #endif
 
 	sprintf( filename, "%s" PLAT_SEPARATOR "%s", prefix, PHONE_TREE_FILE );
 #ifdef USE_BINARY_DATA
-	tree_size = plat_mmap_create(
-			&m_mmap,
-			filename,
-			FLAG_ATTRIBUTE_READ );
-	if ( tree_size == 0 )
+	plat_mmap_set_invalid( &tree_mmap );
+	tree_size = plat_mmap_create( &tree_mmap, filename, FLAG_ATTRIBUTE_READ );
+	assert( plat_mmap_is_valid( &tree_mmap ) );
+	if ( tree_size < 0 )
 		return;
 
 	csize = tree_size;
-	tree = plat_mmap_set_view( &m_mmap, &offset, &csize );
-
-	plat_mmap_close( &m_mmap );
-	addTerminateService( TerminateTree );
+	tree = (TreeType *) plat_mmap_set_view( &tree_mmap, &offset, &csize );
+	assert( tree );
 #else
 	infile = fopen( filename, "r" );
 	assert( infile );
@@ -134,6 +138,8 @@ void ReadTree( const char *prefix )
 	}
 	fclose( infile );
 #endif
+
+	addTerminateService( TerminateTree );
 }
 
 static int CheckBreakpoint( int from, int to, int bArrBrkpt[] )
@@ -190,10 +196,10 @@ static int CheckUserChoose(
 				 * 'selectStr[chno]' test if not ok then return 0, 
 				 * if ok then continue to test. */
 				len = c.to - c.from;
-				if ( memcmp( 
-					&pUserPhraseData->wordSeq[ ( c.from - from ) * MAX_UTF8_SIZE ], 
-					selectStr[ chno ], 
-					len * MAX_UTF8_SIZE ) )
+				if ( memcmp(
+					ueStrSeek( pUserPhraseData->wordSeq, c.from - from ),
+					selectStr[ chno ],
+					ueStrNBytes( selectStr[ chno ], len ) ) )
 					break;
 			}
 
@@ -206,7 +212,6 @@ static int CheckUserChoose(
 							pUserPhraseData->wordSeq,
 							user_alloc, 1);
 				}
-				p_phr->phrase[ user_alloc * MAX_UTF8_SIZE ] = '\0';
 				p_phr->freq = pUserPhraseData->userfreq;
 				*pp_phr = p_phr;
 			}
@@ -249,9 +254,10 @@ static int CheckChoose(
 				 * then continue to test
 				 */
 				len = c.to - c.from;
-				if ( memcmp( 
-					&( phrase->phrase[ ( c.from - from ) *  MAX_UTF8_SIZE ] ), 
-					selectStr[ chno ], len * MAX_UTF8_SIZE ) )
+				if ( memcmp(
+					ueStrSeek( phrase->phrase, c.from - from ),
+					selectStr[ chno ],
+					ueStrNBytes( selectStr[ chno ], len ) ) )
 					break;
 			}
 			else if ( IsIntersect( inte, selectInterval[ chno ] ) ) {
@@ -318,21 +324,22 @@ static void AddInterval(
 	ptd->nInterval++;
 }
 
-static void internal_release_Phrase( int mode, Phrase *pUser, Phrase *pDict )
+/* Item which inserts to interval array */
+typedef enum {
+	USED_PHRASE_NONE,	/**< none of items used */
+	USED_PHRASE_USER,	/**< User phrase */
+	USED_PHRASE_DICT	/**< Dict phrase */
+} UsedPhraseMode;
+
+static void internal_release_Phrase( UsedPhraseMode mode, Phrase *pUser, Phrase *pDict )
 {
-	/* Item who insert to interval array:
-	 *   mode=1: pUser,
-	 *   mode=2: pDict,
-	 *   mode=0 : none of items useed.
-	 *
-	 * we must free the one not used to avoid memory leak
-	 */
+	/* we must free unused phrase entry to avoid memory leak. */
 	switch ( mode ) {
-		case    1:
+		case USED_PHRASE_USER:
 			if ( pDict != NULL )
 				free( pDict );
 			break;
-		case    2:
+		case USED_PHRASE_DICT:
 			if ( pUser != NULL )
 				free( pUser );
 			break;
@@ -353,7 +360,7 @@ static void FindInterval(
 {
 	int end, begin, pho_id;
 	Phrase *p_phrase, *puserphrase, *pdictphrase;
-	uint16 i_used_phrase;
+	UsedPhraseMode i_used_phrase;
 	uint16 new_phoneSeq[ MAX_PHONE_SEQ_LEN ];
 
 	for ( begin = 0; begin < nPhoneSeq; begin++ ) {
@@ -368,10 +375,7 @@ static void FindInterval(
 				sizeof( uint16 ) * ( end - begin + 1 ) );
 			new_phoneSeq[ end - begin + 1 ] = 0;
 			puserphrase = pdictphrase = NULL;
-			/* Items which insert to interval array:
-			 *   0: none of item, 1: puserphrase, 2: pdictphrase
-			 */
-			i_used_phrase = 0;
+			i_used_phrase = USED_PHRASE_NONE;
 
 			/* check user phrase */
 			if ( UserGetPhraseFirst( new_phoneSeq ) &&
@@ -396,62 +400,39 @@ static void FindInterval(
 			 * static dict
 			 */
 			if ( puserphrase != NULL && pdictphrase == NULL ) {
-				AddInterval( 
-					ptd, 
-					begin, 
-					end, 
-					-1, 
-					puserphrase, 
-					IS_USER_PHRASE );
-				i_used_phrase = 1;
+				i_used_phrase = USED_PHRASE_USER;
 			}
 			else if ( puserphrase == NULL && pdictphrase != NULL ) {
-				AddInterval( 
-					ptd, 
-					begin, 
-					end, 
-					pho_id, 
-					pdictphrase, 
-					IS_DICT_PHRASE );
-					i_used_phrase = 2;
+				i_used_phrase = USED_PHRASE_DICT;
 			}
 			else if ( puserphrase != NULL && pdictphrase != NULL ) {
 				/* the same phrase, userphrase overrides */
-				if ( ! memcmp( 
+				if ( ! strcmp(
 					puserphrase->phrase, 
-					pdictphrase, 
-					( end - begin + 1 ) * MAX_UTF8_SIZE * sizeof( char ) ) ) {
-					AddInterval( 
-						ptd, 
-						begin, 
-						end, 
-						-1, 
-						puserphrase, 
-						IS_USER_PHRASE );
-					i_used_phrase = 1;
+					pdictphrase->phrase ) ) {
+					i_used_phrase = USED_PHRASE_USER;
 				}
 				else {
 					if ( puserphrase->freq > pdictphrase->freq ) {
-						AddInterval( 
-							ptd, 
-							begin, 
-							end, 
-							-1, 
-							puserphrase, 
-							IS_USER_PHRASE );
-						i_used_phrase = 1;
+						i_used_phrase = USED_PHRASE_USER;
 					}
 					else {
-						AddInterval( 
-							ptd, 
-							begin, 
-							end, 
-							pho_id, 
-							pdictphrase, 
-							IS_DICT_PHRASE );
-						i_used_phrase = 2;
+						i_used_phrase = USED_PHRASE_DICT;
 					}
 				}
+			}
+			switch ( i_used_phrase ) {
+				case USED_PHRASE_USER:
+					AddInterval( ptd, begin, end, -1, puserphrase,
+							IS_USER_PHRASE );
+					break;
+				case USED_PHRASE_DICT:
+					AddInterval( ptd, begin, end, pho_id, pdictphrase,
+							IS_DICT_PHRASE );
+					break;
+				case USED_PHRASE_NONE:
+				default:
+					break;
 			}
 			internal_release_Phrase(
 				i_used_phrase,
@@ -505,7 +486,7 @@ static int CompFrom( IntervalType *pa, IntervalType *pb )
 
 /* 
  * First we compare the 'nMatchCnnct'.
- * If the values are the same, we will compare the 'freq'
+ * If the values are the same, we will compare the 'score'
  */
 static int CompRecord( const RecordNode **pa, const RecordNode **pb )
 {
@@ -513,7 +494,7 @@ static int CompRecord( const RecordNode **pa, const RecordNode **pb )
 
 	if ( diff )
 		return diff;
-	return ( (*pb)->freq - (*pa)->freq );
+	return ( (*pb)->score - (*pa)->score );
 }
 
 
@@ -628,27 +609,6 @@ static void OutputRecordStr(
 		IntervalType selectInterval[],
 		int nSelect, TreeDataType *ptd )
 {
-	/*
-	PhraseIntervalType inter;
-	int i;
-
-	LoadChar( out_buf, phoneSeq, nPhoneSeq );
-	out_buf[ nPhoneSeq * 3 ] = '\0' ;
-	for ( i = 0; i < nRecord; i++ ) {
-		inter = ptd->interval[ record[ i ] ];
-		memcpy(
-				out_buf + inter.from * 3,
-				( inter.p_phr )->phrase,
-				( inter.to - inter.from ) * 3 );
-	}
-	for ( i = 0; i < nSelect; i++ ) {
-		inter.from = selectInterval[ i ].from;
-		inter.to = selectInterval[ i ].to ;
-		ueStrNCpy(
-				ueStrSeek( out_buf, inter.from ),
-				selectStr[ i ], ( inter.to - inter.from ), -1);
-	}
-	*/
 	PhraseIntervalType inter;
 	int i;
 
@@ -669,9 +629,45 @@ static void OutputRecordStr(
 	}
 }
 
-static int LoadPhraseAndCountFreq( int *record,int nRecord, TreeDataType *ptd )
+static int rule_largest_sum( int *record, int nRecord, TreeDataType *ptd )
 {
-	int i, total_freq = 0;
+	int i, score = 0;
+	PhraseIntervalType inter;
+
+	for ( i = 0; i < nRecord; i++ ) {
+		inter = ptd->interval[ record[ i ] ];
+		assert( inter.p_phr );
+		score += inter.to - inter.from;
+	}
+	return score;
+}
+
+static int rule_largest_avgwordlen( int *record, int nRecord, TreeDataType *ptd )
+{
+	/* constant factor 6=1*2*3, to keep value as integer */
+	return 6 * rule_largest_sum( record, nRecord, ptd ) / nRecord;
+}
+
+static int rule_smallest_lenvariance( int *record, int nRecord, TreeDataType *ptd )
+{
+	int i, j, score = 0;
+	PhraseIntervalType inter1, inter2;
+
+	/* kcwu: heuristic? why variance no square function? */
+	for ( i = 0; i < nRecord; i++ ) {
+		for ( j = i + 1; j < nRecord; j++ ) {
+			inter1 = ptd->interval[ record[ i ] ];
+			inter2 = ptd->interval[ record[ j ] ];
+			assert( inter1.p_phr && inter2.p_phr );
+			score += abs((inter1.to - inter1.from) - (inter2.to - inter2.from));
+		}
+	}
+	return -score;
+}
+
+static int rule_largest_freqsum( int *record, int nRecord, TreeDataType *ptd )
+{
+	int i, score = 0;
 	PhraseIntervalType inter;
 
 	for ( i = 0; i < nRecord; i++ ) {
@@ -679,11 +675,24 @@ static int LoadPhraseAndCountFreq( int *record,int nRecord, TreeDataType *ptd )
 		assert( inter.p_phr );
 		
 		/* We adjust the 'freq' of One-word Phrase */
-		total_freq += ( inter.to - inter.from == 1 ) ?
+		score += ( inter.to - inter.from == 1 ) ?
 			( inter.p_phr->freq / 512 ) :
 			inter.p_phr->freq;
 	}
-	return total_freq;
+	return score;
+}
+
+static int LoadPhraseAndCountScore( int *record, int nRecord, TreeDataType *ptd )
+{
+	int total_score = 0;
+	/* NOTE: the balance factor is tuneable */
+	if (nRecord) {
+		total_score += 1000*rule_largest_sum( record, nRecord, ptd );
+		total_score += 1000*rule_largest_avgwordlen( record, nRecord, ptd );
+		total_score += 100*rule_smallest_lenvariance( record, nRecord, ptd );
+		total_score += rule_largest_freqsum( record, nRecord, ptd );
+	}
+	return total_score;
 }
 
 static int IsRecContain( int *intA, int nA, int *intB, int nB, TreeDataType *ptd )
@@ -710,7 +719,7 @@ static int IsRecContain( int *intA, int nA, int *intB, int nB, TreeDataType *ptd
 	return 1;
 }
 
-static void SortListByFreq( TreeDataType *ptd )
+static void SortListByScore( TreeDataType *ptd )
 {
 	int i, listLen;
 	RecordNode *p, **arr;
@@ -726,13 +735,13 @@ static void SortListByFreq( TreeDataType *ptd )
 	assert( arr );
 
 	for ( 
-		i = 0, p=ptd->phList;
+		i = 0, p = ptd->phList;
 		i < listLen;
 		p = p->next, i++ ) {
 		arr[ i ] = p;
-		p->freq = LoadPhraseAndCountFreq( 
-			p->arrIndex, 
-			p->nInter, 
+		p->score = LoadPhraseAndCountScore(
+			p->arrIndex,
+			p->nInter,
 			ptd );
 	}
 
@@ -896,13 +905,13 @@ static void ShowList( TreeDataType *ptd )
 				ptd->interval[ p->arrIndex[ i ] ].to );
 		}
 		DEBUG_OUT(
-			"\n   freq : %d , nMatchCnnct : %d\n", 
-			p->freq, 
+			"\n"
+			   "      score : %d , nMatchCnnct : %d\n",
+			p->score,
 			p->nMatchCnnct );
 	}
 	DEBUG_OUT( "\n" );
 }
-
 #endif
 
 static RecordNode* NextCut( TreeDataType *tdt, PhrasingOutput *ppo )
@@ -954,7 +963,7 @@ int Phrasing(
 	Discard2( &treeData );
 	SaveList( &treeData );
 	CountMatchCnnct( &treeData, bUserArrCnnct, nPhoneSeq );
-	SortListByFreq( &treeData );
+	SortListByScore( &treeData );
 	NextCut( &treeData, ppo );
 
 #ifdef ENABLE_DEBUG
@@ -976,4 +985,3 @@ int Phrasing(
 	CleanUpMem( &treeData );
 	return 0;
 }
-

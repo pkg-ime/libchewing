@@ -1,3 +1,9 @@
+libchewing (0.3.2-1) unstable; urgency=low
+
+  * New Upstream Version 
+
+ -- Kanru Chen <koster@debian.org.tw>  Thu, 04 Dec 2008 15:34:03 +0800
+
 libchewing (0.3.1-1) unstable; urgency=low
 
   * New Upstream Version

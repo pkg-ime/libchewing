@@ -35,17 +35,10 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = chewing.pc
 
 chewing_headers = \
-	include/char.h \
 	include/chewingio.h \
-	include/dict.h \
-	include/hanyupinyin.h \
 	include/mod_aux.h \
-	include/userphrase.h \
 	include/chewing.h \
-	include/chewing-utf8-util.h \
-	include/global.h \
-	include/hash.h \
-	include/zuin.h
+	include/global.h
 
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)/$(prefix)/include/chewing

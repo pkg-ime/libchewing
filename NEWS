@@ -1,3 +1,26 @@
+What's New in libchewing 0.3.2
+---------------------------------------------------------
+* Add gcc visibility support to hide private APIs.
+* APIs and Headers refactoring.
+* Doxygen-friendly API documentation.
+* New binary data manipulation approach to dramatically reduce storage
+  usage and loading time via memory mapping. (enabled by default)
+* New word segmentation method based on mmseg.
+* Improved auto-learn new phrases method.
+* Improved test suite and added simple benchmark program.
+* Option to indicate the behavior for phrase choice to be rearward
+  or not.
+* New APIs to enumerate supported keyboard types.
+* Repair improper memory access.
+* API united in Win32 and UNIX world.
+* Initial Pythin binding support.
+* Merged with libchewing-data project. (r342)
+* Canonical debugging messages.
+* Successful stories:
+  . OpenBSD porting
+  . ibus-chewing : chewing engine for ibus input method framework.
+  . UIM-chewing leveraging libchewing 0.3.x development branch.
+
 What's New in libchewing 0.3.1
 ----------------------------------------------------------
 * New keyboard layout DACHEN_CP26.
@@ -9,7 +32,7 @@ What's New in libchewing 0.3.1
 * Improved reminding message text.
 * Sync with libchewingdata project.
 * A new HanYu-PinYin mapping table
-* More robust behaver when IM crashes.
+* More robust behavior when IM crashes.
 * Allow '#' comment and blank line in tsi.src.
 * Fix chewing switch between Full/Half mode and cursor moves one space in
   gedit.
@@ -62,6 +85,8 @@ What's New in libchewing 0.3.0
     IM support.
   . OXIM input method suite from OpenDesktop/OSSI provides
     Chewing support as its default input method.
+  . New Win32-Chewing subproject to provide efficient input
+    mthod solution on Microsoft Windows platforms.
     
 What's New in libchewing 0.2.7
 ----------------------------------------------------------
@@ -96,7 +121,6 @@ What's New in libchewing 0.2.5
 
 What's New in libchewing 0.2.4
 ----------------------------------------------------------
-
 * Merge from SpaceChewing:
   . Dvorak Hsu keyboard layout.
   . Hanin style support.
@@ -111,7 +135,6 @@ What's New in libchewing 0.2.4
 
 What's New in libchewing 0.2.3
 ----------------------------------------------------------
-
 * Fix candidate phrase choice bug.
 * Built-in debugging routines.
 * Test suite & sample implementation.

@@ -111,6 +111,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_BINARY_DATA = @ENABLE_BINARY_DATA@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
@@ -209,7 +210,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = porting_layer
 INCLUDES = \
-	-I$(top_builddir)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/include/internal \
 	-I$(top_srcdir)/src/porting_layer/include \
 	-DCHEWING_DATADIR=\"$(datadir)/chewing\"
 
