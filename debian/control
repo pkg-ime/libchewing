@@ -3,11 +3,12 @@ Section: libs
 Priority: optional
 Maintainer: Kanru Chen <koster@debian.org.tw>
 Uploaders: Andrew Lee <andrew@linux.org.tw>
-Build-Depends: debhelper (>= 7), gcc (>= 3:3.3),libtool (>= 1.5.6)
+Build-Depends: debhelper (>= 7), gcc (>= 3:3.3), libtool (>= 1.5.6)
 Standards-Version: 3.8.0
 Homepage: http://chewing.csie.net
 DM-Upload-Allowed: yes
 Vcs-Git: git://git.debian.org/git/users/kanru-guest/libchewing.git
+Vcs-Browser: http://git.debian.org/?p=users/kanru-guest/libchewing.git;a=summary
 
 Package: libchewing3-dev
 Conflicts: libchewing-dev, libchewing1-dev, libchewing2-dev
