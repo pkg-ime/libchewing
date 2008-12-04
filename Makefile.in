@@ -108,6 +108,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_BINARY_DATA = @ENABLE_BINARY_DATA@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
@@ -231,17 +232,10 @@ CLEANFILES = *.bak
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = chewing.pc
 chewing_headers = \
-	include/char.h \
 	include/chewingio.h \
-	include/dict.h \
-	include/hanyupinyin.h \
 	include/mod_aux.h \
-	include/userphrase.h \
 	include/chewing.h \
-	include/chewing-utf8-util.h \
-	include/global.h \
-	include/hash.h \
-	include/zuin.h
+	include/global.h
 
 all: all-recursive
 

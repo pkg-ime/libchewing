@@ -87,6 +87,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_BINARY_DATA = @ENABLE_BINARY_DATA@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
@@ -183,7 +184,9 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = -I$(top_builddir)/include
+INCLUDES = -I$(top_srcdir)/include \
+		   -I$(top_srcdir)/include/internal
+
 noinst_LTLIBRARIES = libcommon.la
 libcommon_la_SOURCES = \
 	key2pho.c \

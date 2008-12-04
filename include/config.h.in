@@ -98,6 +98,9 @@
 /* Runtime is under Win32 environment */
 #undef UNDER_WIN32
 
+/* Experimental use of binary data */
+#undef USE_BINARY_DATA
+
 /* Version number of package */
 #undef VERSION
 

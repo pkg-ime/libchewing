@@ -29,6 +29,9 @@
 #include <string.h>
 
 #include "global.h"
+#include "global-private.h"
+#include "key2pho-private.h"
+#include "config.h"
 
 #define MAXLEN		149
 #define MAXZUIN		9
@@ -70,15 +73,6 @@ void DataSetNum( long index )
 		data[ index ].num[ i++ ] = UintFromPhone( p );
 }
 
-void SetNewline2Zero( long index )
-{
-	char *p;
-
-	p = strchr( data[ index ].str, '\n' );
-	if ( p )
-		*p = '\0';
-}
-
 void DataStripSpace( long index )
 {
 	long i, k = 0;
@@ -105,6 +99,15 @@ void DataStripSpace( long index )
 	data[ index ].str[ k ] = '\0';
 }
 
+void DataStripAll( long index )
+{
+	char *p;
+
+	p = strchr( data[ index ].str, ' ' );
+	if ( p )
+		*p = '\0';
+}
+
 int CompRecord( const void *a, const void *b )
 {
 	long i;
@@ -129,23 +132,21 @@ int CompUint( long a, long b )
 	return 0;
 }
 
-#ifdef USED_IN_DAT2BIN
-int sort_dic()
-#else
 int main( int argc, char *argv[] )
-#endif
 {
 	FILE *infile;
 	FILE *dictfile, *treedata, *ph_index;
 	char in_file[ MAX_FILE_NAME ] = "tsi.src";
 	long i, k;
+    int tmp;
+#ifdef USE_BINARY_DATA
+	unsigned char size;
+#endif
 
-#ifndef USED_IN_DAT2BIN
 	if ( argc < 2 ) 
 		printf( user_msg );
 	else 
 		strcpy( in_file, argv[ 1 ] );
-#endif
 
 	infile = fopen( in_file, "r" );
 
@@ -154,9 +155,14 @@ int main( int argc, char *argv[] )
 		exit( -1 );
 	}
 
+#ifdef USE_BINARY_DATA
+	dictfile = fopen( DICT_FILE, "wb" );
+	ph_index = fopen( PH_INDEX_FILE, "wb" );
+#else
 	dictfile = fopen( DICT_FILE, "w" );
-	treedata = fopen( IN_FILE, "w" );
 	ph_index = fopen( PH_INDEX_FILE, "w" );
+#endif
+	treedata = fopen( IN_FILE, "w" );
 
 	if ( !dictfile || !treedata || !ph_index ) {
 		fprintf( stderr, "Error opening output file!\n" );
@@ -169,19 +175,43 @@ int main( int argc, char *argv[] )
 		if ( data[ nData ].str[0] == '\n' )
 			continue;
 		DataSetNum( nData );
-		SetNewline2Zero( nData );
+		DataStripAll( nData );
 		nData++;
 	}
 	qsort( data, nData, sizeof( RECORD ), CompRecord );
 
 	for ( i = 0; i < nData - 1; i++ ) {
-		if ( ( i == 0 ) || ( CompUint( i, i - 1 ) != 0 ) ) 
+		if ( ( i == 0 ) || ( CompUint( i, i - 1 ) != 0 ) )  {
+#ifdef USE_BINARY_DATA
+			tmp = ftell( dictfile );
+			fwrite( &tmp, sizeof( tmp ), 1, ph_index );
+#else
 			fprintf( ph_index, "%ld\n", ftell( dictfile ) );
-		fprintf( dictfile, "%s\t", data[ i ].str );
+#endif
+		}
+#ifdef USE_BINARY_DATA
+		size = sizeof( char ) * strlen( data[ i ].str );
+		fwrite( &size, sizeof( unsigned char ), 1, dictfile );
+		fwrite( data[ i ].str, size, 1, dictfile );
+		fwrite( &data[ i ].freq, sizeof( int ), 1, dictfile );
+#else
+		fprintf( dictfile, "%s %d\t", data[ i ].str, data[ i ].freq );
+#endif
 	}
+#ifdef USE_BINARY_DATA
+	tmp = ftell( dictfile );
+	fwrite( &tmp, sizeof( tmp ), 1, ph_index );
+	size = sizeof( char ) * strlen( data[ nData - 1 ].str );
+	fwrite( &size, sizeof( unsigned char ), 1, dictfile );
+	fwrite( data[ nData - 1 ].str, size, 1, dictfile );
+	fwrite( &data[ nData - 1 ].freq, sizeof( int ), 1, dictfile );
+	tmp = ftell( dictfile );
+	fwrite( &tmp, sizeof( tmp ), 1, ph_index );
+#else
 	fprintf( ph_index, "%ld\n", ftell( dictfile ) ); 
-	fprintf( dictfile, "%s", data[ nData - 1 ].str );
+	fprintf( dictfile, "%s %d", data[ nData - 1 ].str, data[ nData - 1 ].freq );
 	fprintf( ph_index, "%ld\n", ftell( dictfile ) );
+#endif
 
 	for ( i = 0; i < nData; i++ ) {
 		if ( ( i > 0 ) && ( CompUint( i, i - 1 ) == 0 ) )
@@ -190,7 +220,6 @@ int main( int argc, char *argv[] )
 		for ( k = 0; data[ i ].num[ k ]; k++ )
 			fprintf (treedata, "%hu ", data[ i ].num[ k ] );
 		fprintf( treedata, "0\n" );
-
 	}
 	fclose( infile );
 	fclose( ph_index );

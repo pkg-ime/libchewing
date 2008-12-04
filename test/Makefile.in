@@ -32,7 +32,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = testchewing$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2)
+bin_PROGRAMS = testchewing$(EXEEXT) simulate$(EXEEXT) \
+	randkeystroke$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2)
 subdir = test
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -60,6 +61,11 @@ am__genkeystroke_SOURCES_DIST = gen_keystroke.c
 @ENABLE_TEXT_UI_TRUE@am_genkeystroke_OBJECTS =  \
 @ENABLE_TEXT_UI_TRUE@	gen_keystroke.$(OBJEXT)
 genkeystroke_OBJECTS = $(am_genkeystroke_OBJECTS)
+randkeystroke_SOURCES = randkeystroke.c
+randkeystroke_OBJECTS = randkeystroke.$(OBJEXT)
+randkeystroke_LDADD = $(LDADD)
+am_simulate_OBJECTS = simulate.$(OBJEXT)
+simulate_OBJECTS = $(am_simulate_OBJECTS)
 am_testchewing_OBJECTS = testchewing.$(OBJEXT)
 testchewing_OBJECTS = $(am_testchewing_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
@@ -74,10 +80,11 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(do_test_SOURCES) $(genkeystroke_SOURCES) \
-	$(testchewing_SOURCES)
+SOURCES = $(do_test_SOURCES) $(genkeystroke_SOURCES) randkeystroke.c \
+	$(simulate_SOURCES) $(testchewing_SOURCES)
 DIST_SOURCES = $(am__do_test_SOURCES_DIST) \
-	$(am__genkeystroke_SOURCES_DIST) $(testchewing_SOURCES)
+	$(am__genkeystroke_SOURCES_DIST) randkeystroke.c \
+	$(simulate_SOURCES) $(testchewing_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -106,6 +113,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_BINARY_DATA = @ENABLE_BINARY_DATA@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
@@ -204,24 +212,29 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 testdir = $(top_builddir)/test
 TESTDATA = $(testdir)/test.txt
-DEFAULT_TESTDATA = $(testdir)/default-test.txt
+DEFAULT_TESTDATA = $(top_srcdir)/test/default-test.txt
 LIBCHEWING = \
 	$(top_builddir)/src/libchewing.la \
 	$(top_builddir)/src/common/libcommon.la \
 	$(top_builddir)/src/porting_layer/src/libporting_layer.la
 
 DATADIR = $(top_builddir)/data
+@ENABLE_BINARY_DATA_FALSE@CHINDEXS = $(DATADIR)/ch_index.dat
+@ENABLE_BINARY_DATA_TRUE@CHINDEXS = $(DATADIR)/ch_index_begin.dat \
+@ENABLE_BINARY_DATA_TRUE@		   $(DATADIR)/ch_index_phone.dat
+
 CHEWINGDATA = \
 	$(DATADIR)/us_freq.dat \
-	$(DATADIR)/ch_index.dat \
 	$(DATADIR)/dict.dat \
 	$(DATADIR)/ph_index.dat \
 	$(DATADIR)/fonetree.dat \
 	$(DATADIR)/swkb.dat \
-	$(DATADIR)/symbols.dat
+	$(DATADIR)/symbols.dat \
+	$(CHINDEXS)
 
 INCLUDES = \
-	-I$(top_builddir)/include \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/include/internal \
 	-DCHEWING_DATA_PREFIX="\"$(DATADIR)\"" \
 	-DTEST_HASH_DIR="\"$(PWD)\"" \
 	$(CHECK_CFLAGS) \
@@ -231,6 +244,9 @@ INCLUDES = \
 testchewing_SOURCES = testchewing.c
 testchewing_LDADD = $(LIBCHEWING)
 testchewing_DEPENDENCIES = $(LIBCHEWING)
+simulate_SOURCES = simulate.c
+simulate_LDADD = $(LIBCHEWING)
+simulate_DEPENDENCIES = $(LIBCHEWING)
 @ENABLE_TEXT_UI_FALSE@TEXT_UI_BIN = 
 @ENABLE_TEXT_UI_TRUE@TEXT_UI_BIN = genkeystroke
 @ENABLE_TEXT_UI_TRUE@genkeystroke_SOURCES = gen_keystroke.c
@@ -320,6 +336,12 @@ do-test$(EXEEXT): $(do_test_OBJECTS) $(do_test_DEPENDENCIES)
 genkeystroke$(EXEEXT): $(genkeystroke_OBJECTS) $(genkeystroke_DEPENDENCIES) 
 	@rm -f genkeystroke$(EXEEXT)
 	$(LINK) $(genkeystroke_OBJECTS) $(genkeystroke_LDADD) $(LIBS)
+randkeystroke$(EXEEXT): $(randkeystroke_OBJECTS) $(randkeystroke_DEPENDENCIES) 
+	@rm -f randkeystroke$(EXEEXT)
+	$(LINK) $(randkeystroke_OBJECTS) $(randkeystroke_LDADD) $(LIBS)
+simulate$(EXEEXT): $(simulate_OBJECTS) $(simulate_DEPENDENCIES) 
+	@rm -f simulate$(EXEEXT)
+	$(LINK) $(simulate_OBJECTS) $(simulate_LDADD) $(LIBS)
 testchewing$(EXEEXT): $(testchewing_OBJECTS) $(testchewing_DEPENDENCIES) 
 	@rm -f testchewing$(EXEEXT)
 	$(LINK) $(testchewing_OBJECTS) $(testchewing_LDADD) $(LIBS)
@@ -332,6 +354,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/do-test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_keystroke.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/randkeystroke.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simulate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-key2pho.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-mmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-utf8.Po@am__quote@
@@ -545,9 +569,7 @@ uninstall-am: uninstall-binPROGRAMS
 
 
 $(TESTDATA): $(DEFAULT_TESTDATA)
-	if [ ! -f $(TESTDATA) ]; then \
-		cp $(DEFAULT_TESTDATA) $(TESTDATA) ; \
-	fi
+	@if [ ! -f $(TESTDATA) ]; then cp $(DEFAULT_TESTDATA) $(TESTDATA) ; fi
 
 check: testchewing $(TESTDATA) $(CHEWINGDATA)
 	$(testdir)/testchewing < $(TESTDATA)
@@ -555,10 +577,10 @@ check: testchewing $(TESTDATA) $(CHEWINGDATA)
 
 vcheck: check
 	@echo "Please waiting for the valgrind results..."
-	valgrind \
+	libtool --mode=execute valgrind \
 		--leak-check=full \
 		--show-reachable=yes \
-		$(testdir)/.libs/testchewing < $(TESTDATA)
+		$(testdir)/testchewing < $(TESTDATA)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
