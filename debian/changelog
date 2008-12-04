@@ -1,6 +1,12 @@
 libchewing (0.3.2-1) unstable; urgency=low
 
   * New Upstream Version 
+  * [5d96bf5] Update watch address
+  * [351d417] Add Vcs-Git field
+  * [63cd26a] Add Vcs-Browser field
+  * [e2a59e2] Conflict with scim-chewing << 0.3.3
+  * [cd15be8] Change libchewing3-data from all to any since we build
+    binary data now.
 
  -- Kanru Chen <koster@debian.org.tw>  Thu, 04 Dec 2008 15:34:03 +0800
 
