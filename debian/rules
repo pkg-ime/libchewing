@@ -1,14 +1,7 @@
 #!/usr/bin/make -f
 
-DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
-
 override_dh_auto_configure:
-	dh_auto_configure -- --datadir=/usr/lib/${DEB_HOST_MULTIARCH}
-
-	echo '/usr/lib/${DEB_HOST_MULTIARCH}/chewing/*.dat' >> \
-			${CURDIR}/debian/libchewing3-data.install
-	echo '/usr/lib/${DEB_HOST_MULTIARCH}/chewing/*.tab' >> \
-			${CURDIR}/debian/libchewing3-data.install
+	dh_auto_configure -- --datadir=/usr/share/libchewing3
 
 override_dh_auto_clean:
 	[ ! -f test/Makefile ] || (cd test; $(MAKE) distclean)
