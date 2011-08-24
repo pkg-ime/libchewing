@@ -1,27 +1,11 @@
 #!/usr/bin/make -f
- 
-build: build-stamp
-build-stamp:
-	dh build --before configure
+
+override_dh_auto_configure:
 	dh_auto_configure -- --datadir=/usr/share/libchewing3
-	dh build --after configure
-	touch build-stamp
 
-clean:
+override_dh_auto_clean:
 	[ ! -f test/Makefile ] || (cd test; $(MAKE) distclean)
-	dh clean
+	dh_auto_clean
 
-install: build install-stamp
-install-stamp:
-	dh install
-	touch install-stamp
-
-# Build architecture-independent files here.
-binary-indep: build install
-	dh binary-indep
-
-# Build architecture-dependent files here.
-binary-arch: build install
-	dh binary-arch
-
-binary: binary-indep binary-arch
+%:
+	dh $@
