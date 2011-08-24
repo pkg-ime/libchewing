@@ -5,7 +5,7 @@
  *	Lu-chuan Kung and Kang-pen Chen.
  *	All rights reserved.
  *
- * Copyright (c) 2004, 2005, 2006
+ * Copyright (c) 2004, 2005, 2006, 2010
  *	libchewing Core Team. See ChangeLog for details.
  *
  * See the file "COPYING" for information on usage and redistribution
@@ -29,10 +29,10 @@ int ChewingIsEntering( ChewingData *pgdata );
 void CleanAllBuf( ChewingData * );
 int SpecialSymbolInput( int key, ChewingData *pgdata );
 int FullShapeSymbolInput( int key, ChewingData *pgdata );
-int EasySymbolInput( int key, ChewingData *pgdata, ChewingOutput *pgo );
+int EasySymbolInput( int key, ChewingData *pgdata );
 int SymbolInput( int key, ChewingData *pgdata );
 int SymbolChoice( ChewingData *pgdata, int sel_i );
-int HaninSymbolInput( ChoiceInfo *pci, AvailInfo *pai, const uint16 phoneSeq[],  int candPerPage );
+int HaninSymbolInput( ChewingData *pgdata );
 int WriteChiSymbolToBuf( wch_t csBuf[], int csBufLen, ChewingData *pgdata );
 int ReleaseChiSymbolBuf( ChewingData *pgdata, ChewingOutput *);
 int AddChi( uint16 phone, ChewingData *pgdata );
@@ -53,7 +53,7 @@ int IsPreferIntervalConnted( int cursor, ChewingData *pgdata );
 int OpenSymbolChoice( ChewingData *pgdata );
 
 int InitSymbolTable( const char *prefix );
-int InitEasySymbolInput(const char *prefix);
+int InitEasySymbolInput( const char *prefix );
 
 #endif
 

@@ -2,7 +2,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT(libchewing, 0.3.2, chewing-devel@googlegroups.com)
+AC_INIT(libchewing, 0.3.3, chewing-devel@googlegroups.com)
 AC_CONFIG_AUX_DIR([autotools])
 AC_CONFIG_SRCDIR([src/chewingio.c])
 
@@ -42,8 +42,8 @@ AC_PREFIX_DEFAULT(/usr)
 # Init libtool
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
-#AC_LIB_LTDL
 AC_SUBST(LIBTOOL_DEPS)
+AC_SUBST(LIBTOOL_EXPORT_OPTIONS) 
 
 # libtool option to control which symbols are exported
 # right now, symbols starting with _ are not exported
@@ -54,6 +54,9 @@ AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
 AC_PROG_CC
 AC_LANG(C)
 AC_C_CONST
+
+CC_FOR_BUILD=${CC_FOR_BUILD-${CC}}
+AC_SUBST(CC_FOR_BUILD)
 
 # Checks if doxygen is avaiable
 AC_PATH_PROG(DOXYGEN, doxygen, no)
@@ -191,8 +194,8 @@ AM_CONDITIONAL(ENABLE_BINARY_DATA, test x$binary_data = "xyes")
 # Platform-dependent
 dnl What kind of system are we using?
 case $host_os in
-win32*)
-        SYSTEM=win32
+win*)
+        SYSTEM=windows
 	;;
 cygwin*)
         SYSTEM=unix
@@ -203,8 +206,8 @@ cygwin*)
 esac
 
 case $SYSTEM in
-win32)
-AC_DEFINE(UNDER_WIN32, 1,
+win)
+AC_DEFINE(UNDER_WINDOWS, 1,
 	[Runtime is under Win32 environment])
 	;;
 unix)

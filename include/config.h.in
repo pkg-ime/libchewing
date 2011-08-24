@@ -86,6 +86,9 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -96,7 +99,7 @@
 #undef UNDER_POSIX
 
 /* Runtime is under Win32 environment */
-#undef UNDER_WIN32
+#undef UNDER_WINDOWS
 
 /* Experimental use of binary data */
 #undef USE_BINARY_DATA
