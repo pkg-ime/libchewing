@@ -10,8 +10,9 @@ libchewing (0.3.3-1) unstable; urgency=low
     - Update the email addresses
   * Update Standards-Version to 3.9.2
   * Update Vcs-* info
+  * Build depends on autotools-dev (Closes: #558571).
 
- -- Kan-Ru Chen <koster@debian.org>  Wed, 24 Aug 2011 22:38:33 +0800
+ -- Kan-Ru Chen <koster@debian.org>  Thu, 25 Aug 2011 00:26:54 +0800
 
 libchewing (0.3.2-1) unstable; urgency=low
 

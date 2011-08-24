@@ -8,4 +8,4 @@ override_dh_auto_clean:
 	dh_auto_clean
 
 %:
-	dh $@
+	dh $@ --with autotools_dev
