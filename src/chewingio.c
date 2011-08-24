@@ -5,7 +5,7 @@
  *	Lu-chuan Kung and Kang-pen Chen.
  *	All rights reserved.
  *
- * Copyright (c) 2004, 2005, 2006, 2007, 2008
+ * Copyright (c) 2004-2008, 2010
  *	libchewing Core Team. See ChangeLog for details.
  *
  * See the file "COPYING" for information on usage and redistribution
@@ -20,6 +20,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "chewing-utf8-util.h"
 #include "global.h"
@@ -34,6 +35,7 @@
 #include "hanyupinyin-private.h"
 #include "private.h"
 #include "chewingio.h"
+#include "mod_aux.h"
 
 #ifdef ENABLE_DEBUG
 #include <stdio.h>
@@ -85,7 +87,7 @@ static void TerminateDebug()
 }               
 #endif
 
-int addTerminateService( void (*callback)() )
+int addTerminateService( callback_t callback )
 {
 	if ( callback ) {
 		int i;
@@ -98,6 +100,33 @@ int addTerminateService( void (*callback)() )
 		return 0;
 	}
 	return 1;
+}
+
+static void chooseCandidate( ChewingContext *ctx, int toSelect, int key_buf_cursor )
+{
+	ChewingData *pgdata = ctx->data;
+	if ( toSelect ) {
+		if ( ! pgdata->bSelect ) {
+			ChoiceFirstAvail( pgdata );
+		} else {
+			if ( pgdata->config.bPhraseChoiceRearward ) {
+				int avail_willbe = (pgdata->availInfo.currentAvail > 0) ?
+					pgdata->availInfo.currentAvail - 1 :
+					pgdata->availInfo.nAvail - 1;
+				pgdata->chiSymbolCursor = pgdata->choiceInfo.oldChiSymbolCursor -
+					pgdata->availInfo.avail[ avail_willbe ].len;
+				if ( chewing_buffer_Len( ctx ) >
+						pgdata->choiceInfo.oldChiSymbolCursor ) {
+					pgdata->chiSymbolCursor++;
+				}
+			}
+			ChoiceNextAvail( pgdata );
+		}
+	} else if ( pgdata->symbolKeyBuf[ key_buf_cursor ] ) {
+		/* Open Symbol Choice List */
+		if ( ! pgdata->choiceInfo.isSymbol )
+			OpenSymbolChoice( pgdata );
+	}
 }
 
 CHEWING_API ChewingContext *chewing_new()
@@ -556,17 +585,7 @@ CHEWING_API int chewing_handle_Space( ChewingContext *ctx )
 				if ( ChewingIsChiAt( key_buf_cursor, pgdata ) )
 					toSelect = 1;
 
-				if ( toSelect ) {
-					if ( ! pgdata->bSelect )
-						ChoiceFirstAvail( pgdata );
-					else
-						ChoiceNextAvail( pgdata );
-				}
-				else if ( pgdata->symbolKeyBuf[ key_buf_cursor ] ) {
-					/* Open Symbol Choice List */
-					if( ! pgdata->choiceInfo.isSymbol )
-						OpenSymbolChoice( pgdata );
-				}
+				chooseCandidate( ctx, toSelect, key_buf_cursor );
 				break;
 		}
 	}
@@ -755,19 +774,7 @@ CHEWING_API int chewing_handle_Down( ChewingContext *ctx )
 	if ( ChewingIsChiAt( key_buf_cursor, pgdata ) )
 			toSelect = 1;
 
-	if ( toSelect ) {
-		if( ! pgdata->bSelect ) {
-			ChoiceFirstAvail( pgdata );
-		}
-		else {
-			ChoiceNextAvail( pgdata );
-		}
-	} 
-	else if ( pgdata->symbolKeyBuf[ key_buf_cursor ] ) {
-		/* Open Symbol Choice List */
-		if ( ! pgdata->choiceInfo.isSymbol )
-			OpenSymbolChoice( pgdata );
-	}
+	chooseCandidate( ctx, toSelect, key_buf_cursor );
 
 	MakeOutputWithRtn( pgo, pgdata, keystrokeRtn );
 	return 0;
@@ -1049,7 +1056,7 @@ static int dvorak_convert( int key )
 		';',':','q','Q','j','J','k','K','x','X','b','B','m','M',
 		'w','W','v','V','z','Z'};
 	char qkey[] = {
-		'Q','q','w','W','e','E','r','R','t','T','y','Y','u','U',
+		'q','Q','w','W','e','E','r','R','t','T','y','Y','u','U',
 		'i','I','o','O','p','P','[','{',']','}','\\','|',
 		'a','A','s','S','d','D','f','F','g','G','h','H','j','J',
 		'k','K','l','L',';',':','\'','\"',
@@ -1143,7 +1150,7 @@ CHEWING_API int chewing_handle_Default( ChewingContext *ctx, int key )
 	else {
 		if ( pgdata->bChiSym == CHINESE_MODE ) {
 			if ( pgdata->config.bEasySymbolInput != 0 ) {
-				EasySymbolInput( key, pgdata, pgo );
+				EasySymbolInput( key, pgdata );
 				goto End_keyproc;
 			}
 
@@ -1152,11 +1159,7 @@ CHEWING_API int chewing_handle_Default( ChewingContext *ctx, int key )
 				pgdata->bSelect = 1;
 				pgdata->choiceInfo.oldChiSymbolCursor = pgdata->chiSymbolCursor;
 
-				HaninSymbolInput(
-					&( pgdata->choiceInfo ),
-					&( pgdata->availInfo ),
-					pgdata->phoneSeq,
-					pgdata->config.candPerPage );
+				HaninSymbolInput( pgdata );
 				goto End_KeyDefault;
 			}
 
@@ -1297,11 +1300,7 @@ CHEWING_API int chewing_handle_CtrlNum( ChewingContext *ctx, int key )
 		pgdata->bSelect = 1;
 		pgdata->choiceInfo.oldChiSymbolCursor = pgdata->chiSymbolCursor;
 
-		HaninSymbolInput(
-				&( pgdata->choiceInfo ),
-				&( pgdata->availInfo ),
-				pgdata->phoneSeq,
-				pgdata->config.candPerPage );
+		HaninSymbolInput( pgdata );
 		CallPhrasing( pgdata );
 		MakeOutputWithRtn( pgo, pgdata, keystrokeRtn );
 		return 0;

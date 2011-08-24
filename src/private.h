@@ -10,6 +10,7 @@
 
 #ifdef ENABLE_DEBUG
 #include <stdarg.h>
+#include <stdio.h>
 extern FILE *fp_g;
 #define DEBUG_OUT( ... ) \
 	do { \
@@ -49,5 +50,6 @@ __forceinline void DEBUG_OUT( char* str, ... ){ }
 typedef int (*CompFuncType)( const void *, const void * );
 
 #define TerminateServicesNUM 10
-extern int addTerminateService( void (*callback)() );
+typedef void (*callback_t)();
+extern int addTerminateService( callback_t );
 #endif

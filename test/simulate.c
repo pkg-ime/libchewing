@@ -10,6 +10,7 @@
 
 #define USED_IN_SIMULATION
 #include "testchewing.c"
+#include <unistd.h>
 
 #define FN_MATERIALS "materials.txt"
 
@@ -17,7 +18,10 @@ static FILE *fp = NULL;
 
 int init_sim()
 {
-	fp = fopen( FN_MATERIALS, "r" );
+	if ( 0 == access( FN_MATERIALS "-random", R_OK ))
+		fp = fopen( FN_MATERIALS "-random", "r" );
+	else
+		fp = fopen( FN_MATERIALS, "r" );
 	return (fp != NULL);
 }
 
@@ -26,6 +30,7 @@ int fini_sim()
 	if ( fp )
 		fclose( fp );
 	fflush( stdout );
+	return 0;
 }
 
 static char linebuf[ MAXLEN ];
@@ -40,7 +45,7 @@ int fake_getchar()
 
 	if ( remainder == 0 ) {
 start:
-		if ( fgets( linebuf, MAXLEN, fp ) == EOF )
+		if ( fgets( linebuf, MAXLEN, fp ) == NULL )
 			return EOF;
 		if ( linebuf[ 0 ] == '#' || linebuf[ 0 ] == ' ' )
 			goto start;
@@ -74,7 +79,7 @@ int main()
 		        "[ Report ]\n");
 		printf( "Checks: %d words,  Failures: %d words\n",
 		        tested_word_count, failed_word_count );
-		printf( "Ratio: %.2f%\n",
+		printf( "Ratio: %.2f%%\n",
 		        (float) (tested_word_count - failed_word_count ) /
 			        tested_word_count * 100 );
 	}

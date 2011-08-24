@@ -1,3 +1,231 @@
+2011-02-27  Jim Huang  <jserv@0xlab.org>
+
+	* configure.ac: Bump version to 0.3.3
+	* NEWS: ditto.
+
+2011-02-20  Jim Huang  <jserv@0xlab.org>
+
+	* configure.ac,
+	src/tools/Makefile.am: Fix tools to run on the host system during
+	cross-compile.
+	Patched by Zach Kuznia <zork@chromium.org>
+	Review URL: http://codereview.chromium.org/2640005
+
+2011-02-20  Jim Huang  <jserv@0xlab.org>
+
+	* src/chewingio.c: Add inclusion for aux function.
+
+	* test/testchewing.c (get_keystroke),
+	test/simulate.c (fake_getchar) (fini_sim): Fix compilation warnings by
+	clang.
+
+2011-02-20  Jim Huang  <jserv@0xlab.org>
+
+	* data/tsi.src: Merged with libchewing-data.
+	* data/svnrev: Bump merged rev to r455
+	* NEWS: Ditto
+
+2011-02-20  Jim Huang  <jserv@0xlab.org>
+
+	* scripts/gendiff-from-libchewingdata.sh: Explicit use 'bash'
+
+2010-11-15  Jim Huang  <jserv@0xlab.org>
+
+	* test/simulate.c (init_sim),
+	test/simulate.sh: Support randomize testing key sequence.
+
+	* test/Makefile.am: clean materials.txt-random
+
+2010-11-13  Jim Huang  <jserv@0xlab.org>
+
+	* src/choice.c (SetAvailInfo): Refactored for parameter passing.
+	(ChoiceFirstAvail): Ditto.
+
+2010-11-13  Jim Huang  <jserv@0xlab.org>
+
+	* scripts/remove-autotool.sh: Remove include/config.h.in
+
+2010-11-13  Jim Huang  <jserv@0xlab.org>
+
+	* src/chewingio.c (chooseCandidate): New helper function.
+	(chewing_handle_Space) (chewing_handle_Down): Revise phrase choice
+	from rearward logic.
+
+	* src/choice.c (SeekPhraseHead): New helper function.
+	(SetAvailInfo) (ChoiceFirstAvail): Ditto.
+	Patched by Ding-Yi Chen <dingyichen@gmail.com>
+
+2010-11-13  Jim Huang  <jserv@0xlab.org>
+
+	* data/tsi.src: Add some entries to work around improper '不' cases.
+
+	* test/materials.txt: Update test cases.
+
+2010-11-10  Jim Huang  <jserv@0xlab.org>
+
+	* include/internal/chewing-private.h (wch_t): Ensure this structure is
+	aligned.
+	Patched by Ding-Yi Chen <dingyichen@gmail.com>
+	https://bugzilla.redhat.com/show_bug.cgi?id=625980
+
+2010-11-09  Jim Huang  <jserv@0xlab.org>
+
+	* src/common/key2pho.c,
+	src/common/chewing-utf8-util.c,
+	src/hanyupinyin.c,
+	src/char.c,
+	src/tools/sort_dic.c,
+	src/chewingutil.c,
+	src/zuin.c: Fix compilation warning with gcc-4.5
+
+2010-11-09  Jim Huang  <jserv@0xlab.org>
+
+	* src/chewingutil.c (EasySymbolInput),
+	include/internal/chewingutil.h: Shrink parameter.
+
+	* src/chewingio.c (chewing_handle_Default): Ditto.
+
+2010-11-08  Jim Huang  <jserv@0xlab.org>
+
+	* src/chewingutil.c (HaninSymbolInput): Refactoring.  Simplify
+	prototype.
+	(OpenSymbolChoice): Ditto.
+	include/internal/chewingutil.h: Ditto.
+
+	* src/chewingio.c (chewing_handle_Default) (chewing_handle_CtrlNum):
+	Changed accordinly.
+
+2010-11-08  Jim Huang  <jserv@0xlab.org>
+
+	* src/chewingio.c (addTerminateService),
+	src/private.h: Add typedef to simplify prototype.
+
+2010-11-08  Jim Huang  <jserv@0xlab.org>
+
+	* src/chewingutil.c (SymbolChoice): Fix unexpected candidate disorder
+	when doing symbol choice.
+
+	* src/hash.c (isValidChineseString): Avoid dangling pointer.
+
+2010-11-08  Jim Huang  <jserv@0xlab.org>
+
+	* src/common/key2pho.c (key_str),
+	src/chewingio.c (qkey),
+	src/zuin.c (IsDvorakHsuPhoEndKey) (IsET26PhoEndKey) (HsuPhoInput):
+	DvorakHsu tone mark should be same with Hsu's mark after conversion.
+
+	* src/choice.c (ChoiceInfoAppendChi): New helper function.
+	(SetChoiceInfo): Issue 10.  Fix the handling of phonetic symbols in
+	Hsu and Dvorak Hsu keyboard.  Refactoring.
+	(ChoiceFirstAvail) (ChoicePrevAvail) (ChoiceNextAvail): Refactoring.
+	Patched by Ding-Yi Chen <dingyichen@gmail.com>
+
+	* include/internal/choice-private.h: Ditto.
+
+2010-11-08  Jim Huang  <jserv@0xlab.org>
+
+	* src/tools/sort_word.c (Output): Fix file descriptor leak
+
+2010-11-08  Jim Huang  <jserv@0xlab.org>
+
+	* configure.ac: Properly add LIBTOOL_EXPORT_OPTIONS
+	patched by openSUSE.
+
+2010-11-08  Jim Huang  <jserv@0xlab.org>
+
+	* scripts/gendiff-from-libchewingdata.sh: Don't gendiff if given
+	svnrev <= original svnrev.
+
+2010-11-08  Jim Huang  <jserv@0xlab.org>
+
+	* data/phone.cin,
+	data/tsi.src: Merged with libchewing-data.
+	Changes:
+	- Remove incomplete lines to avoid tool from crashing
+	- Eliminate incorrect single character mapping
+
+	* data/svnrev: Bump merged rev to r454
+	* NEWS: Ditto
+
+2010-11-08  Jim Huang  <jserv@0xlab.org>
+
+	* scripts/gendiff-from-libchewingdata.sh: Use LABEL instead of file
+	name during patch generation.
+
+2010-11-08  Jim Huang  <jserv@0xlab.org>
+
+	* data/svnrev: New file. Store the SVN revision number of last merge.
+
+	* data/NOTE: After merging changing from libchewing-data project,
+	please do update Subversion revision number in file "data/svnrev".
+
+	* scripts/gendiff-from-libchewingdata.sh: New file.  Used for
+	generting the diff files from libchewingdata between certain svnver
+	and last merge one.
+
+2010-11-07  Jim Huang  <jserv@0xlab.org>
+
+	* src/porting_layer/include/sys/plat_win32.h: Renamed
+	to src/porting_layer/include/sys/plat_windows.h
+	Platform transition from 'win32' to 'windows' for generic
+	win32, win64, and (possibly) wince support.
+
+	* src/porting_layer/src/plat_mmap_win32.c: Ditto.
+	Rename to src/porting_layer/src/plat_mmap_windows.c
+
+	* src/porting_layer/include/plat_types.h,
+	src/porting_layer/src/Makefile.am,
+	configure.ac: Changed accordingly.
+
+2010-11-07  Jim Huang  <jserv@0xlab.org>
+
+	* darwin/: Removed since ports maintainer would take care.
+
+2010-11-07  Jim Huang  <jserv@0xlab.org>
+
+	* src/tree.c (InitTree): Validate tree_size in binary data.
+
+2010-08-26  Jim Huang  <jserv@0xlab.org>
+
+	* src/hanyupinyin.c (InitHanyuPinYin): Ensure the explicit return
+	value when initialization process is done.
+
+2010-08-26  Jim Huang  <jserv@0xlab.org>
+
+	* src/choice.c: Fix implicit declaration of function 'ChoiceEndChoice'
+
+2009-10-01  Kuang-che Wu  <kcwu@csie.org>
+
+	* src/mod_aux.c (chewing_zuin_String): issue 352, zuin_count should
+	return the number of zhuyin symbols. Thank dingyichen's report and fix.
+
+2009-02-01  Kuang-che Wu  <kcwu@csie.org>
+
+	* scripts/gen-tabe-diff.sh, scripts/tsi-chewing.diff,
+	scripts/cvsup-tsi-src.sh: Removed.
+
+2009-01-29  Jim Huang  <jserv.tw@gmail.com>
+
+	* python/chewing.py: Added cand_String, zuin_String and aux_String for
+	convenience.
+	Revised the removal of handle_Default.argtypes because handle_Default
+	accepts	(void *, int) instead of (void *, char).
+	Patched by Ding-Yi Chen <dingyichen@gmail.com>.
+	
+2009-01-24  Kuang-che Wu  <kcwu@csie.org>
+
+	* src/tree.c (TreeFindPhrase): Fix memory access violation, the case
+	of leaf node (index value -1) was not handled.
+
+2008-12-08  Kuang-che Wu  <kcwu@csie.org>
+
+	* test/randkeystroke.c: Fix random key range, avoid genetate chr(0)
+	incorrectly. Provide random seed argument. Fix vim mode line.
+
+2008-12-04  Kuang-che Wu  <kcwu@csie.org>
+
+	* src/private.h: Fix compile error if --enable-debug
+
 2008-12-01  Kanru Chen  <kanru@kanru.info>
 
 	* configure.ac: Bump version to 0.3.2 .
@@ -269,8 +497,8 @@
 	* src/common/key2pho.c (zhuin_tab) (zhuin_tab_num),
 	src/chewingutil.c (SetUpdatePhraseMsg) (SpecialSymbolInput)
 	(symbol_buf): Added human readable comments around the HEX values.
-	The reason why we onvert string literal to hex representation is for
-	the sake of portability, that avoid some buggy or faulty environment
+	The reason why we convert string literal to hex representation is for
+	the sake of portability, that avoids some buggy or faulty environment
 	like Microsoft VC9 to misinterpret the string.
 
 2008-10-23  Kanru Chen  <kanru@kanru.info>
@@ -285,8 +513,8 @@
 
 2008-10-22  Kanru Chen  <kanru@kanru.info>
 
-	* src/chewingio.c (chewing_handle_Esc): Remove the hack of SemiSymbolInput
-	since SemiSymbolInput is no longer existed.
+	* src/chewingio.c (chewing_handle_Esc): Remove the hack of
+	SemiSymbolInput since SemiSymbolInput no longer exists.
 
 2008-10-22  Kanru Chen  <kanru@kanru.info>
 
@@ -1065,7 +1293,7 @@
 
 	* src/hanyupinyin.c (HanyuPinYinToZuin):
 	  The return value of HanyuPinYinToZuin should not be zero when
-          looking up table failed.
+	  looking up table failed.
 
 	* src/zuin.c (PinYinInput):
 	  It should clean the buffer of PinYin data and return "ZUIN_ABSORB"
@@ -1578,8 +1806,8 @@
 	src/common/key2pho.c,
 	src/private.h,
 	include/hash.h:
-	Add some conditional compilation and missing header includes for Win32 to 
-	enhance portability.
+	Add some conditional compilation and missing header includes for Win32
+	to enhance portability.
 
 2005-11-11  Kanru Chen  <kanru.96@stu.csie.ncnu.edu.tw>
 
@@ -1949,7 +2177,8 @@
 2005-03-29  Jim Huang  <jserv@kaffe.org>
 
 	* src/hanyupinying.c
-	(hanyuInitialsMap) (hanyuFinalsMap): Adapt reference table from Lin Yu-Tang.
+	(hanyuInitialsMap) (hanyuFinalsMap): Adapt reference table from
+	Lin Yu-Tang.
 	(HanyuPinYingToZuin): Add "jo" detection.
 	Provided by Jeff Chen  <u6191488@mail.cs.tku.edu.tw>.
 
@@ -2568,7 +2797,8 @@
 	src/tools/Makefile.am,
 	src/Makefile.am,
 	data/Makefile.am:
-	Adapt autotoolized patch from Kanru Chen  <kanru.96@stu.csie.ncnu.edu.tw>
+	Adapt autotoolized patch from
+	Kanru Chen  <kanru.96@stu.csie.ncnu.edu.tw>
 
 	* COPYING: Specify LGPL.
 	* debian: Debianized information.
@@ -2582,4 +2812,5 @@
 	* data/tsi.src: fix some typo and errors.
 
 2004-03-25  Jim Huang  <jserv@kaffe.org>
-	Initial release of libchewing.
+
+	* Initial release of libchewing.

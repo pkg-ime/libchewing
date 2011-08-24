@@ -42,38 +42,42 @@ static int compkey( const void *k1, const void *k2 )
 
 int InitHanyuPinYin( const char *prefix )
 {
-	const char DIRPATH_SEP_FILENAME[] = "%s" PLAT_SEPARATOR "%s";
 	char filename[PATH_MAX];
 	int i;
 	FILE *fd;
 
-	sprintf( filename, DIRPATH_SEP_FILENAME, prefix, PINYIN_TAB_NAME );
+	sprintf( filename,
+		"%s" PLAT_SEPARATOR "%s",
+		prefix, PINYIN_TAB_NAME );
 
 	fd = fopen(filename, "r");
 
 	if ( ! fd )
 		return 0;
 
-	if ( fd ) {
-		addTerminateService( TerminateHanyuPinyin );
-		fscanf( fd, "%d", &HANYU_INITIALS );
-		++HANYU_INITIALS;
-		hanyuInitialsMap = ALC( keymap, HANYU_INITIALS );
-		for ( i = 0; i < HANYU_INITIALS - 1; i++ ) {
-			fscanf( fd, "%s %s",
-				hanyuInitialsMap[ i ].pinyin,
-				hanyuInitialsMap[ i ].zuin );
-		}
-		fscanf( fd, "%d", &HANYU_FINALS );
-		++HANYU_FINALS;
-		hanyuFinalsMap = ALC( keymap, HANYU_FINALS );
-		for ( i = 0; i < HANYU_FINALS - 1; i++ ) {
-			fscanf( fd, "%s %s",
-				hanyuFinalsMap[ i ].pinyin,
-				hanyuFinalsMap[ i ].zuin );
-		}
-		fclose( fd );
+	addTerminateService( TerminateHanyuPinyin );
+
+	fscanf( fd, "%d", &HANYU_INITIALS );
+	++HANYU_INITIALS;
+	hanyuInitialsMap = ALC( keymap, HANYU_INITIALS );
+	for ( i = 0; i < HANYU_INITIALS - 1; i++ ) {
+		fscanf( fd, "%s %s",
+			hanyuInitialsMap[ i ].pinyin,
+			hanyuInitialsMap[ i ].zuin );
 	}
+
+	fscanf( fd, "%d", &HANYU_FINALS );
+	++HANYU_FINALS;
+	hanyuFinalsMap = ALC( keymap, HANYU_FINALS );
+	for ( i = 0; i < HANYU_FINALS - 1; i++ ) {
+		fscanf( fd, "%s %s",
+			hanyuFinalsMap[ i ].pinyin,
+			hanyuFinalsMap[ i ].zuin );
+	}
+
+	fclose( fd );
+
+	return 1;
 }
 
 /**
