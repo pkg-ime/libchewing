@@ -1,3 +1,10 @@
+libchewing (0.3.3-1) unstable; urgency=low
+
+  * New upstream release
+  * Change debhelper compatibility to 9
+
+ -- Kan-Ru Chen <koster@debian.org>  Wed, 24 Aug 2011 22:38:33 +0800
+
 libchewing (0.3.2-1) unstable; urgency=low
 
   * New Upstream Version 
