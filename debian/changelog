@@ -3,6 +3,7 @@ libchewing (0.3.3-1) unstable; urgency=low
   * New upstream release
   * Change debhelper compatibility to 9
   * Simplify the build rules
+  * Convert to MultiArch
 
  -- Kan-Ru Chen <koster@debian.org>  Wed, 24 Aug 2011 22:38:33 +0800
 

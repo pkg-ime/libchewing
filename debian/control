@@ -31,6 +31,7 @@ Provides: libchewing
 Section: libs
 Priority: optional
 Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
 Depends: libchewing3-data (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: scim-chewing (<< 0.3.3)
 Description: intelligent phonetic input method library
