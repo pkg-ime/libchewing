@@ -7,8 +7,8 @@ Build-Depends: debhelper (>= 8.1.3~), gcc (>= 3:3.3), libtool (>= 1.5.6)
 Standards-Version: 3.9.2
 Homepage: http://chewing.csie.net
 DM-Upload-Allowed: yes
-Vcs-Git: git://git.debian.org/git/users/kanru-guest/libchewing.git
-Vcs-Browser: http://git.debian.org/?p=users/kanru-guest/libchewing.git;a=summary
+Vcs-Git: git://anonscm.debian.org/pkg-ime/libchewing.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-ime/libchewing.git;a=summary
 
 Package: libchewing3-dev
 Conflicts: libchewing-dev, libchewing1-dev, libchewing2-dev
