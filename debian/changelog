@@ -5,6 +5,9 @@ libchewing (0.3.3-1) unstable; urgency=low
   * Simplify the build rules
   * Convert to 3.0 (quilt) source format
   * Convert to MultiArch
+  * Update Maintainer field
+    - Change the Maintainer field to IME Packaging Team
+    - Update the email addresses
 
  -- Kan-Ru Chen <koster@debian.org>  Wed, 24 Aug 2011 22:38:33 +0800
 

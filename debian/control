@@ -1,8 +1,8 @@
 Source: libchewing
 Section: libs
 Priority: optional
-Maintainer: Kanru Chen <koster@debian.org.tw>
-Uploaders: Andrew Lee <andrew@linux.org.tw>
+Maintainer: IME Packaging Team <pkg-ime-devel@lists.alioth.debian.org>
+Uploaders: Kan-Ru Chen <koster@debian.org>, Andrew Lee (李健秋) <ajqlee@debian.org>
 Build-Depends: debhelper (>= 8.1.3~), gcc (>= 3:3.3), libtool (>= 1.5.6)
 Standards-Version: 3.8.0
 Homepage: http://chewing.csie.net
