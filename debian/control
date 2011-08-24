@@ -30,6 +30,7 @@ Package: libchewing3
 Provides: libchewing
 Section: libs
 Priority: optional
+Multi-Arch: same
 Architecture: any
 Pre-Depends: ${misc:Pre-Depends}
 Depends: libchewing3-data (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
@@ -49,6 +50,7 @@ Provides: libchewing-data
 Conflicts: libchewing-data (<= 0.2.7)
 Section: misc
 Priority: optional
+Multi-Arch: foreign
 Architecture: any
 Depends: ${misc:Depends}
 Description:intelligent phonetic input method library - data files
